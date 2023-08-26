@@ -1,6 +1,7 @@
 package ru.practicum;
 
 import org.springframework.http.*;
+import org.springframework.lang.Nullable;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,15 +24,20 @@ public abstract class BaseClient {
     }
 
     private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path,
-                                                          Map<String, Object> parameters, T body) {
+                                                          @Nullable Map<String, Object> parameters, @Nullable T body) {
         HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders());
 
+        ResponseEntity<Object> statsServerResponse;
         try {
-            ResponseEntity<Object> statsServerResponse = rest.exchange(path, method, requestEntity, Object.class, parameters);
-            return prepareResponse(statsServerResponse);
+            if (parameters != null) {
+                statsServerResponse = rest.exchange(path, method, requestEntity, Object.class, parameters);
+            } else {
+                statsServerResponse = rest.exchange(path, method, requestEntity, Object.class);
+            }
         } catch (HttpStatusCodeException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
         }
+        return prepareResponse(statsServerResponse);
     }
 
     private HttpHeaders defaultHeaders() {
