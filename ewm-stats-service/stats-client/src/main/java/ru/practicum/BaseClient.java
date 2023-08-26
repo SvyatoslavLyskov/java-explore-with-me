@@ -1,7 +1,6 @@
 package ru.practicum;
 
 import org.springframework.http.*;
-import org.springframework.lang.NonNull;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
