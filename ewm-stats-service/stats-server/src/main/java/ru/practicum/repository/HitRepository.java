@@ -3,14 +3,12 @@ package ru.practicum.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 import ru.practicum.model.Hit;
 import ru.practicum.HitOutputDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Repository
 public interface HitRepository extends JpaRepository<Hit, Long> {
     @Query("SELECT new ru.practicum.HitOutputDto(h.app, h.uri, count(DISTINCT h.ip)) " +
             "FROM Hit h " +

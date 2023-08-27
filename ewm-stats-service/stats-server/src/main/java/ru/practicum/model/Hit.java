@@ -18,11 +18,11 @@ public class Hit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "hit_id")
     Long id;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 64)
     String app;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 128)
     String uri;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 64)
     String ip;
     @Column(name = "created", nullable = false)
     LocalDateTime timestamp;
