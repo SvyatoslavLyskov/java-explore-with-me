@@ -19,14 +19,13 @@ public abstract class BaseClient {
         return makeAndSendRequest(HttpMethod.POST, path, null, body);
     }
 
-    protected <T> ResponseEntity<Object> get(String path, Map<String, Object> parameters) {
+    protected ResponseEntity<Object> get(String path, @Nullable Map<String, Object> parameters) {
         return makeAndSendRequest(HttpMethod.GET, path, parameters, null);
     }
 
     private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path,
                                                           @Nullable Map<String, Object> parameters, @Nullable T body) {
         HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders());
-
         ResponseEntity<Object> statsServerResponse;
         try {
             if (parameters != null) {
@@ -51,13 +50,10 @@ public abstract class BaseClient {
         if (response.getStatusCode().is2xxSuccessful()) {
             return response;
         }
-
         ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.status(response.getStatusCode());
-
         if (response.hasBody()) {
             return responseBuilder.body(response.getBody());
         }
-
         return responseBuilder.build();
     }
 }

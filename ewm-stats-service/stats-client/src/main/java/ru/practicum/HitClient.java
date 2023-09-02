@@ -47,8 +47,9 @@ public class HitClient extends BaseClient {
                 "uris", builder.toString(),
                 "unique", unique
         );
-        ResponseEntity<Object> response = get("/stats?start={start}&end={end}&uris={uris}&unique={unique}",
-                parameters);
-        return objectMapper.convertValue(response.getBody(), new TypeReference<List<HitOutputDto>>() {});
+        ResponseEntity<Object> response = get(
+                "/stats?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
+        return objectMapper.convertValue(response.getBody(), new TypeReference<List<HitOutputDto>>() {
+        });
     }
 }
