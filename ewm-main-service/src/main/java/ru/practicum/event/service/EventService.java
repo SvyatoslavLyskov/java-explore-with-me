@@ -80,27 +80,27 @@ public class EventService {
 
     public EventFullDto getInitiatorEventById(Long userId, Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event", eventId));
-        checkInitiator(userId,eventId);
+        checkInitiator(userId, eventId);
         List<HitOutputDto> hits = unionService.getViews(List.of(eventId));
         Map<Long, Long> views = StatUtil.mapHitsToViewCountByEventId(hits);
-        log.info("Найдено событие {}, опубликованное пользователем {}.",eventId, userId);
+        log.info("Найдено событие {}, опубликованное пользователем {}.", eventId, userId);
         return ObjectMapper.toEventFullDto(event, views.getOrDefault(event.getId(), 0L));
     }
 
     public List<RequestDto> findEventRequestsByInitiator(Long userId, Long eventId) {
-        checkInitiator(userId,eventId);
+        checkInitiator(userId, eventId);
         List<Request> requests = requestRepository.findByEventId(eventId);
-        log.info("Найдены запросы на участие в событии {}, опубликованноe пользователем {}.",eventId, userId);
+        log.info("Найдены запросы на участие в событии {}, опубликованноe пользователем {}.", eventId, userId);
         return ObjectMapper.toRequestDtoList(requests);
     }
 
     @Transactional
     public EventFullDto updateInitiatorEvent(NewEventDto eventUpdateDto, Long userId, Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event", eventId));
-      checkInitiator(userId,eventId);
+        checkInitiator(userId, eventId);
         if (event.getState().equals(PUBLISHED)) {
             throw new ConflictException(String.format(
-                    "Пользователь %s не может изменить опубликованное событие %s",userId, eventId));
+                    "Пользователь %s не может изменить опубликованное событие %s", userId, eventId));
         }
         Event updatedEvent = updateEvent(event, eventUpdateDto);
         List<HitOutputDto> hits = unionService.getViews(List.of(eventId));
@@ -116,7 +116,7 @@ public class EventService {
                 .confirmedRequests(Collections.emptyList())
                 .rejectedRequests(Collections.emptyList())
                 .build();
-        checkInitiator(userId,eventId);
+        checkInitiator(userId, eventId);
         if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             return result;
         }
@@ -284,12 +284,12 @@ public class EventService {
         }
     }
 
-    private void checkInitiator(Long userId, Long eventId){
+    private void checkInitiator(Long userId, Long eventId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User", userId));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event", eventId));
         if (!user.getId().equals(event.getInitiator().getId())) {
             throw new ConflictException(String.format(
-                    "Пользователь %s не является инициатором события %s.",userId, eventId));
+                    "Пользователь %s не является инициатором события %s.", userId, eventId));
         }
     }
 

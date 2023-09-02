@@ -17,7 +17,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 public @interface EventDate {
     String message() default "Неверная дата события. Дата должна быть в допустимом формате и быть в будущем.";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
+
     String format() default DateTimeFormat.DATE_TIME_FORMATTER;
 }

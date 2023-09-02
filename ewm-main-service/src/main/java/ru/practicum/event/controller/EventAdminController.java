@@ -28,12 +28,12 @@ public class EventAdminController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<EventFullDto> findAllEventsByAdmin(@RequestParam(required = false) List<Long> users,
-                @RequestParam(required = false) List<State> states,
-                @RequestParam(required = false) List<Long> categories,
-                @RequestParam(required = false) @DateTimeFormat(pattern = DATE_TIME_FORMATTER) LocalDateTime rangeStart,
-                @RequestParam(required = false) @DateTimeFormat(pattern = DATE_TIME_FORMATTER) LocalDateTime rangeEnd,
-                @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
-                @RequestParam(defaultValue = "10") @Positive Integer size) {
+                                                   @RequestParam(required = false) List<State> states,
+                                                   @RequestParam(required = false) List<Long> categories,
+                                                   @RequestParam(required = false) @DateTimeFormat(pattern = DATE_TIME_FORMATTER) LocalDateTime rangeStart,
+                                                   @RequestParam(required = false) @DateTimeFormat(pattern = DATE_TIME_FORMATTER) LocalDateTime rangeEnd,
+                                                   @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                   @RequestParam(defaultValue = "10") @Positive Integer size) {
         return eventService.findAllEventsByAdmin(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 
