@@ -8,24 +8,24 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.HitClient;
 import ru.practicum.HitInputDto;
 import ru.practicum.HitOutputDto;
-import ru.practicum.category.repository.CategoryRepository;
 import ru.practicum.category.model.Category;
-import ru.practicum.event.repository.EventRepository;
-import ru.practicum.event.repository.LocationRepository;
+import ru.practicum.category.repository.CategoryRepository;
 import ru.practicum.event.dto.*;
-import ru.practicum.utils.*;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.Location;
 import ru.practicum.event.model.State;
 import ru.practicum.event.model.Status;
+import ru.practicum.event.repository.EventRepository;
+import ru.practicum.event.repository.LocationRepository;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.UnsupportedException;
-import ru.practicum.request.repository.RequestRepository;
 import ru.practicum.request.dto.RequestDto;
 import ru.practicum.request.model.Request;
-import ru.practicum.user.repository.UserRepository;
+import ru.practicum.request.repository.RequestRepository;
 import ru.practicum.user.model.User;
+import ru.practicum.user.repository.UserRepository;
+import ru.practicum.utils.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -81,14 +81,14 @@ public class EventService {
         checkInitiator(userId, eventId);
         List<HitOutputDto> hits = unionService.getViews(List.of(eventId));
         Map<Long, Long> views = StatUtil.mapHitsToViewCountByEventId(hits);
-        log.info("Найдено событие {} пользователя {}.",eventId, userId);
+        log.info("Найдено событие {} пользователя {}.", eventId, userId);
         return EventMapper.toEventFullDto(event, views.getOrDefault(event.getId(), 0L));
     }
 
     public List<RequestDto> findEventRequestsByInitiator(Long userId, Long eventId) {
-        checkInitiator(userId,eventId);
+        checkInitiator(userId, eventId);
         List<Request> requests = requestRepository.findByEventId(eventId);
-        log.info("Найдены запросы на участие в событии {}, опубликованном пользователем {}.",eventId, userId);
+        log.info("Найдены запросы на участие в событии {}, опубликованном пользователем {}.", eventId, userId);
         return RequestMapper.toRequestDtoList(requests);
     }
 
@@ -98,7 +98,7 @@ public class EventService {
         checkInitiator(userId, eventId);
         if (event.getState().equals(PUBLISHED)) {
             throw new ConflictException(String.format(
-                    "Пользователь %s не может изменить событие %s",userId, eventId));
+                    "Пользователь %s не может изменить событие %s", userId, eventId));
         }
         Event updatedEvent = updateEvent(event, eventUpdateDto);
         List<HitOutputDto> hits = unionService.getViews(List.of(eventId));
@@ -160,7 +160,7 @@ public class EventService {
                                              Boolean onlyAvailable, String sort, Integer from,
                                              Integer size, String uri, String ip) {
         if (rangeStart != null && rangeEnd != null && (rangeStart.isAfter(rangeEnd))) {
-                throw new UnsupportedException("Дата окончания раньше даты начала.");
+            throw new UnsupportedException("Дата окончания раньше даты начала.");
         }
         PageRequest pageRequest = PageRequest.of(from / size, size);
         List<Event> events = eventRepository.findEventsByPublic(

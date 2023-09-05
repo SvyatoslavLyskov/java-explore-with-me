@@ -7,9 +7,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.exception.NotFoundException;
-import ru.practicum.user.repository.UserRepository;
 import ru.practicum.user.dto.UserDto;
 import ru.practicum.user.model.User;
+import ru.practicum.user.repository.UserRepository;
 import ru.practicum.utils.UserMapper;
 
 import java.util.List;
@@ -20,6 +20,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+
+    public static void checkUserAvailability(UserRepository repository, Long id) {
+        if (!repository.existsById(id)) {
+            throw new NotFoundException("Пользователь", id);
+        }
+    }
 
     @Transactional
     public UserDto createUser(UserDto dto) {
@@ -47,11 +53,5 @@ public class UserService {
         checkUserAvailability(userRepository, id);
         userRepository.deleteById(id);
         log.info("Пользователь {} удален.", id);
-    }
-
-    public static void checkUserAvailability(UserRepository repository, Long id) {
-        if (!repository.existsById(id)) {
-            throw new NotFoundException("Пользователь", id);
-        }
     }
 }

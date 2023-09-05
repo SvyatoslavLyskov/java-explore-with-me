@@ -13,8 +13,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
-import static ru.practicum.utils.DateTimeFormat.START;
-
 @Service
 @Slf4j
 @Transactional(readOnly = true)
@@ -42,7 +40,7 @@ public class UnionService {
         for (Long eventId : eventIds) {
             LocalDateTime publicationDate = getPublicationDate(eventId);
             if (publicationDate != null && (earliestDate == null || publicationDate.isBefore(earliestDate))) {
-                    earliestDate = publicationDate;
+                earliestDate = publicationDate;
 
             }
         }

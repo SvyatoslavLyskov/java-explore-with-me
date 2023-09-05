@@ -1,6 +1,9 @@
 package ru.practicum.event.dto;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 
 @EqualsAndHashCode(callSuper = true)
@@ -9,6 +12,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateEventDto extends BaseEventDto {
     StateAction stateAction;
+
     public UpdateEventDto() {
         super();
     }

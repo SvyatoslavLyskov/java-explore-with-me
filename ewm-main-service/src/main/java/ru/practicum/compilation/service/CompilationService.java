@@ -2,26 +2,20 @@ package ru.practicum.compilation.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.HitOutputDto;
-import ru.practicum.compilation.repository.CompilationRepository;
 import ru.practicum.compilation.dto.CompilationInputDto;
 import ru.practicum.compilation.dto.CompilationOutputDto;
 import ru.practicum.compilation.model.Compilation;
+import ru.practicum.compilation.repository.CompilationRepository;
 import ru.practicum.event.repository.EventRepository;
-import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.utils.CompilationMapper;
-import ru.practicum.utils.StatUtil;
 import ru.practicum.utils.UnionService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -31,6 +25,12 @@ public class CompilationService {
     private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
     private final UnionService unionService;
+
+    private static void checkCompilationAvailability(CompilationRepository repository, Long id) {
+        if (!repository.existsById(id)) {
+            throw new NotFoundException("Подборка", id);
+        }
+    }
 
     public List<CompilationOutputDto> findAllCompilations(Boolean pinned, Integer from, Integer size) {
         PageRequest pageRequest = PageRequest.of(from / size, size);
@@ -89,18 +89,11 @@ public class CompilationService {
         return mapCompilationToDto(savedCompilation);
     }
 
-
     @Transactional
     public void removeCompilationById(Long compId) {
         checkCompilationAvailability(compilationRepository, compId);
         compilationRepository.deleteById(compId);
         log.info("Подборка {} удалена.", compId);
-    }
-
-    private static void checkCompilationAvailability(CompilationRepository repository, Long id) {
-        if (!repository.existsById(id)) {
-            throw new NotFoundException("Подборка", id);
-        }
     }
 
     private CompilationOutputDto mapCompilationToDto(Compilation compilation) {
