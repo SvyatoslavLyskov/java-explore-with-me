@@ -2,6 +2,7 @@ package ru.practicum.event.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserRepository;
 import ru.practicum.utils.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -46,6 +48,8 @@ public class EventService {
     private final RequestRepository requestRepository;
     private final HitClient hitClient;
     private final UnionService unionService;
+    @Value("${app.name}")
+    private String appName;
 
     @Transactional
     public EventFullDto createEvent(Long userId, NewEventDto dto) {
@@ -144,11 +148,13 @@ public class EventService {
         return result;
     }
 
-    public EventFullDto findEventById(Long id, String uri, String ip) {
+    public EventFullDto findEventById(Long id, HttpServletRequest request) {
         Event event = eventRepository.findById(id).orElseThrow(() -> new NotFoundException("Событие", id));
         if (!event.getState().equals(PUBLISHED)) {
             throw new NotFoundException(String.format("Событие %s не опубликовано", id));
         }
+        String uri = request.getRequestURI();
+        String ip = request.getRemoteAddr();
         sendStats(uri, ip);
         List<HitOutputDto> hits = unionService.getViews(List.of(id));
         Map<Long, Long> views = StatUtil.mapHitsToViewCountByEventId(hits);
@@ -158,10 +164,12 @@ public class EventService {
     public List<EventShortDto> findAllEvents(String text, List<Long> categories, Boolean paid,
                                              LocalDateTime rangeStart, LocalDateTime rangeEnd,
                                              Boolean onlyAvailable, String sort, Integer from,
-                                             Integer size, String uri, String ip) {
+                                             Integer size, HttpServletRequest request) {
         if (rangeStart != null && rangeEnd != null && (rangeStart.isAfter(rangeEnd))) {
             throw new UnsupportedException("Дата окончания раньше даты начала.");
         }
+        String uri = request.getRequestURI();
+        String ip = request.getRemoteAddr();
         PageRequest pageRequest = PageRequest.of(from / size, size);
         List<Event> events = eventRepository.findEventsByPublic(
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, pageRequest);
@@ -276,7 +284,7 @@ public class EventService {
 
     private void sendStats(String uri, String ip) {
         HitInputDto hitDto = HitInputDto.builder()
-                .app("ewm-main-service")
+                .app(appName)
                 .uri(uri)
                 .ip(ip)
                 .timestamp(LocalDateTime.now())

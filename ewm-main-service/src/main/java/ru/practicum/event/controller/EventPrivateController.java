@@ -28,7 +28,6 @@ public class EventPrivateController {
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public List<EventShortDto> getAllInitiatorEvents(@PathVariable Long userId,
                                                      @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                                      @Positive @RequestParam(defaultValue = "10") Integer size) {
@@ -36,13 +35,11 @@ public class EventPrivateController {
     }
 
     @GetMapping(path = "/{eventId}")
-    @ResponseStatus(HttpStatus.OK)
     public EventFullDto getInitiatorEventById(@PathVariable Long userId, @PathVariable Long eventId) {
         return eventService.getInitiatorEventById(userId, eventId);
     }
 
     @PatchMapping("/{eventId}")
-    @ResponseStatus(HttpStatus.OK)
     public EventFullDto updateInitiatorEvent(@RequestBody @Validated(Update.class) NewEventDto eventUpdateDto,
                                              @PathVariable Long userId, @PathVariable Long eventId) {
 
@@ -50,13 +47,11 @@ public class EventPrivateController {
     }
 
     @GetMapping(path = "/{eventId}/requests")
-    @ResponseStatus(HttpStatus.OK)
     public List<RequestDto> findEventRequestsByInitiator(@PathVariable Long userId, @PathVariable Long eventId) {
         return eventService.findEventRequestsByInitiator(userId, eventId);
     }
 
     @PatchMapping("/{eventId}/requests")
-    @ResponseStatus(HttpStatus.OK)
     public RequestStatusUpdateResultDto updateStatusRequestsByUserId(@RequestBody RequestStatusUpdateRequestDto request,
                                                                      @PathVariable Long userId, @PathVariable Long eventId) {
         return eventService.updateStatusRequestsByUserId(request, userId, eventId);
