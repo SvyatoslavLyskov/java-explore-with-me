@@ -25,7 +25,6 @@ public class HitController {
     }
 
     @GetMapping("/stats")
-    @ResponseStatus(HttpStatus.OK)
     public List<HitOutputDto> getHitStats(
             @RequestParam @DateTimeFormat(pattern = DATE_TIME_FORMAT) LocalDateTime start,
             @RequestParam @DateTimeFormat(pattern = DATE_TIME_FORMAT) LocalDateTime end,

@@ -24,13 +24,11 @@ public class RequestController {
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public List<RequestDto> findRequestsByUserId(@PathVariable Long userId) {
         return requestService.findRequestsByUserId(userId);
     }
 
     @PatchMapping("/{requestId}/cancel")
-    @ResponseStatus(HttpStatus.OK)
     public RequestDto cancelRequest(@PathVariable Long userId, @PathVariable Long requestId) {
         return requestService.cancelRequest(userId, requestId);
     }

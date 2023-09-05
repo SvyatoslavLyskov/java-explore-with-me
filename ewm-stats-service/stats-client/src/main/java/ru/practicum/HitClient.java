@@ -17,17 +17,19 @@ import java.util.Map;
 
 @Service
 public class HitClient extends BaseClient {
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final ObjectMapper objectMapper;
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Autowired
-    public HitClient(@Value("${STATS_SERVER_URL}") String serverUrl, RestTemplateBuilder builder) {
+    public HitClient(@Value("${STATS_SERVER_URL}") String serverUrl, RestTemplateBuilder builder,
+                     ObjectMapper objectMapper) {
         super(
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
                         .requestFactory(HttpComponentsClientHttpRequestFactory::new)
                         .build()
         );
+        this.objectMapper = objectMapper;
     }
 
     public ResponseEntity<Object> addHit(HitInputDto hitInputDto) {

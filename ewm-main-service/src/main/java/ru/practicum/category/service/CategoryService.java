@@ -8,14 +8,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.category.repository.CategoryRepository;
 import ru.practicum.category.dto.CategoryDto;
-import ru.practicum.utils.ObjectMapper;
 import ru.practicum.category.model.Category;
 import ru.practicum.event.repository.EventRepository;
 import ru.practicum.event.model.Event;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
+import ru.practicum.utils.CategoryMapper;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -27,10 +28,10 @@ public class CategoryService {
 
     @Transactional
     public CategoryDto createCategory(CategoryDto dto) {
-        Category category = ObjectMapper.toCategory(dto);
+        Category category = CategoryMapper.toCategory(dto);
         Category savedCategory = categoryRepository.save(category);
         log.info("Создана новая категория {}.", savedCategory.getId());
-        return ObjectMapper.toCategoryDto(savedCategory);
+        return CategoryMapper.toCategoryDto(savedCategory);
     }
 
     @Transactional
@@ -40,14 +41,14 @@ public class CategoryService {
         oldCategory.setName(categoryDto.getName());
         Category updatedCategory = categoryRepository.save(oldCategory);
         log.info("Категория {} обновлена.", categoryId);
-        return ObjectMapper.toCategoryDto(updatedCategory);
+        return CategoryMapper.toCategoryDto(updatedCategory);
     }
 
     @Transactional
     public void removeCategoryById(Long id) {
         checkCategoryAvailability(categoryRepository, id);
-        List<Event> events = eventRepository.findFirstByCategoryId(id);
-        if (!events.isEmpty()) {
+        Event event = eventRepository.findFirstByCategoryId(id);
+        if (event != null) {
             throw new ConflictException("Категория содержит события.");
         }
         categoryRepository.deleteById(id);
@@ -58,7 +59,7 @@ public class CategoryService {
         PageRequest pageRequest = PageRequest.of(from / size, size);
         Page<Category> categories = categoryRepository.findAll(pageRequest);
         log.info("Список категорий получен, всего: {}.", categories.getTotalElements());
-        return ObjectMapper.toCategoryDtoList(categories);
+        return CategoryMapper.toCategoryDtoList(categories);
     }
 
     public CategoryDto findCategoryById(Long categoryId) {
@@ -66,7 +67,7 @@ public class CategoryService {
                 () -> new NotFoundException("Категория", categoryId));
         log.info("Найдена категория {}.", categoryId);
 
-        return ObjectMapper.toCategoryDto(category);
+        return CategoryMapper.toCategoryDto(category);
     }
 
     private static void checkCategoryAvailability(CategoryRepository repository, Long id) {

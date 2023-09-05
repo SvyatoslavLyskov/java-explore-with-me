@@ -12,10 +12,10 @@ import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.request.repository.RequestRepository;
 import ru.practicum.request.dto.RequestDto;
-import ru.practicum.utils.ObjectMapper;
 import ru.practicum.request.model.Request;
 import ru.practicum.user.repository.UserRepository;
 import ru.practicum.user.model.User;
+import ru.practicum.utils.RequestMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -57,12 +57,12 @@ public class RequestService {
             request = requestRepository.save(request);
             event.setConfirmedRequests(event.getConfirmedRequests() + 1L);
             eventRepository.save(event);
-            return ObjectMapper.toRequestDto(request);
+            return RequestMapper.toRequestDto(request);
         }
 
         request = requestRepository.save(request);
         log.info("Пользователь {} отправил запрос на участие в мероприятии {}.", user.getName(), eventId);
-        return ObjectMapper.toRequestDto(request);
+        return RequestMapper.toRequestDto(request);
     }
 
     @Transactional
@@ -73,13 +73,13 @@ public class RequestService {
         request.setStatus(Status.CANCELED);
         Request savedRequest = requestRepository.save(request);
         log.info("Пользователь {} отменил заявку {}.", userId, requestId);
-        return ObjectMapper.toRequestDto(savedRequest);
+        return RequestMapper.toRequestDto(savedRequest);
     }
 
     public List<RequestDto> findRequestsByUserId(Long userId) {
         checkUserAvailability(userRepository, userId);
         List<Request> requests = requestRepository.findByRequesterId(userId);
         log.info("Найдены события пользователя {}.", userId);
-        return ObjectMapper.toRequestDtoList(requests);
+        return RequestMapper.toRequestDtoList(requests);
     }
 }

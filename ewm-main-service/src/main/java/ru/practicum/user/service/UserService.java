@@ -9,8 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.user.repository.UserRepository;
 import ru.practicum.user.dto.UserDto;
-import ru.practicum.utils.ObjectMapper;
 import ru.practicum.user.model.User;
+import ru.practicum.utils.UserMapper;
 
 import java.util.List;
 
@@ -23,10 +23,10 @@ public class UserService {
 
     @Transactional
     public UserDto createUser(UserDto dto) {
-        User user = ObjectMapper.toUser(dto);
+        User user = UserMapper.toUser(dto);
         User savedUser = userRepository.save(user);
         log.info("Создан пользователь {}.", savedUser);
-        return ObjectMapper.toUserDto(savedUser);
+        return UserMapper.toUserDto(savedUser);
     }
 
     public List<UserDto> findAllUsers(List<Long> ids, Integer from, Integer size) {
@@ -34,11 +34,11 @@ public class UserService {
         if (ids == null) {
             Page<User> users = userRepository.findAll(pageRequest);
             log.info("Список пользователей получен.");
-            return ObjectMapper.toUserDtoList(users);
+            return UserMapper.toUserDtoList(users);
         } else {
             List<User> userList = userRepository.findByIdInOrderByIdAsc(ids, pageRequest);
             log.info("Список пользователей по идентификатору получен.");
-            return ObjectMapper.toUserDtoList(userList);
+            return UserMapper.toUserDtoList(userList);
         }
     }
 

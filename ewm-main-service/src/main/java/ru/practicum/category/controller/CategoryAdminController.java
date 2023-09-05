@@ -2,7 +2,6 @@ package ru.practicum.category.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.category.dto.CategoryDto;
 import ru.practicum.category.service.CategoryService;
@@ -10,7 +9,6 @@ import ru.practicum.category.service.CategoryService;
 import javax.validation.Valid;
 
 @RestController
-@Validated
 @RequiredArgsConstructor
 @RequestMapping(path = "/admin/categories")
 public class CategoryAdminController {
@@ -23,7 +21,6 @@ public class CategoryAdminController {
     }
 
     @PatchMapping("/{catId}")
-    @ResponseStatus(value = HttpStatus.OK)
     public CategoryDto updateCategory(@PathVariable("catId") Long categoryId,
                                       @Valid @RequestBody CategoryDto categoryDto) {
 

@@ -19,7 +19,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("SELECT e FROM Event e WHERE e.id = :eventId")
     Optional<Event> findEventByIdWithLock(@Param("eventId") Long eventId);
 
-    List<Event> findFirstByCategoryId(Long categoryId);
+    Event findFirstByCategoryId(Long categoryId);
 
     Set<Event> findByIdIn(Set<Long> ids);
 

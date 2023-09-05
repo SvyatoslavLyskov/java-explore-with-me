@@ -13,7 +13,7 @@ import ru.practicum.category.model.Category;
 import ru.practicum.event.repository.EventRepository;
 import ru.practicum.event.repository.LocationRepository;
 import ru.practicum.event.dto.*;
-import ru.practicum.utils.ObjectMapper;
+import ru.practicum.utils.*;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.Location;
 import ru.practicum.event.model.State;
@@ -26,8 +26,6 @@ import ru.practicum.request.dto.RequestDto;
 import ru.practicum.request.model.Request;
 import ru.practicum.user.repository.UserRepository;
 import ru.practicum.user.model.User;
-import ru.practicum.utils.StatUtil;
-import ru.practicum.utils.UnionService;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -55,7 +53,7 @@ public class EventService {
         Long categoryId = dto.getCategory();
         Category category = categoryRepository.findById(categoryId).orElseThrow(
                 () -> new NotFoundException("Категория", categoryId));
-        Location location = ObjectMapper.toLocation(dto.getLocation());
+        Location location = LocationMapper.toLocation(dto.getLocation());
         locationRepository.save(location);
         if (dto.getPaid() == null) {
             dto.setPaid(false);
@@ -66,16 +64,16 @@ public class EventService {
         if (dto.getParticipantLimit() == null) {
             dto.setParticipantLimit(0L);
         }
-        Event savedEvent = eventRepository.save(ObjectMapper.toEvent(dto, category, location, user));
+        Event savedEvent = eventRepository.save(EventMapper.toEvent(dto, category, location, user));
         log.info("Событие {} добавлено.", savedEvent.getId());
-        return ObjectMapper.toEventFullDto(savedEvent, 0L);
+        return EventMapper.toEventFullDto(savedEvent, 0L);
     }
 
     public List<EventShortDto> getAllInitiatorEvents(Long userId, Integer from, Integer size) {
         PageRequest pageRequest = PageRequest.of(from / size, size);
         List<Event> events = eventRepository.findAllByInitiatorId(userId, pageRequest);
         log.info("Найден список из {} событий пользователя {}.", events.size(), userId);
-        return ObjectMapper.toEventShortDtoList(events);
+        return EventMapper.toEventShortDtoList(events);
     }
 
     public EventFullDto getInitiatorEventById(Long userId, Long eventId) {
@@ -84,14 +82,14 @@ public class EventService {
         List<HitOutputDto> hits = unionService.getViews(List.of(eventId));
         Map<Long, Long> views = StatUtil.mapHitsToViewCountByEventId(hits);
         log.info("Найдено событие {} пользователя {}.",eventId, userId);
-        return ObjectMapper.toEventFullDto(event, views.getOrDefault(event.getId(), 0L));
+        return EventMapper.toEventFullDto(event, views.getOrDefault(event.getId(), 0L));
     }
 
     public List<RequestDto> findEventRequestsByInitiator(Long userId, Long eventId) {
         checkInitiator(userId,eventId);
         List<Request> requests = requestRepository.findByEventId(eventId);
         log.info("Найдены запросы на участие в событии {}, опубликованном пользователем {}.",eventId, userId);
-        return ObjectMapper.toRequestDtoList(requests);
+        return RequestMapper.toRequestDtoList(requests);
     }
 
     @Transactional
@@ -105,7 +103,7 @@ public class EventService {
         Event updatedEvent = updateEvent(event, eventUpdateDto);
         List<HitOutputDto> hits = unionService.getViews(List.of(eventId));
         Map<Long, Long> views = StatUtil.mapHitsToViewCountByEventId(hits);
-        return ObjectMapper.toEventFullDto(updatedEvent, views.getOrDefault(event.getId(), 0L));
+        return EventMapper.toEventFullDto(updatedEvent, views.getOrDefault(event.getId(), 0L));
     }
 
     @Transactional
@@ -141,8 +139,8 @@ public class EventService {
                 rejectedRequests.add(nextRequest);
             }
         }
-        result.setConfirmedRequests(ObjectMapper.toRequestDtoList(confirmedRequests));
-        result.setRejectedRequests(ObjectMapper.toRequestDtoList(rejectedRequests));
+        result.setConfirmedRequests(RequestMapper.toRequestDtoList(confirmedRequests));
+        result.setRejectedRequests(RequestMapper.toRequestDtoList(rejectedRequests));
         return result;
     }
 
@@ -154,7 +152,7 @@ public class EventService {
         sendStats(uri, ip);
         List<HitOutputDto> hits = unionService.getViews(List.of(id));
         Map<Long, Long> views = StatUtil.mapHitsToViewCountByEventId(hits);
-        return ObjectMapper.toEventFullDto(event, views.getOrDefault(event.getId(), 0L));
+        return EventMapper.toEventFullDto(event, views.getOrDefault(event.getId(), 0L));
     }
 
     public List<EventShortDto> findAllEvents(String text, List<Long> categories, Boolean paid,
@@ -171,7 +169,7 @@ public class EventService {
         sendStats(uri, ip);
         List<HitOutputDto> hits = unionService.getViews(eventIds);
         Map<Long, Long> views = StatUtil.mapHitsToViewCountByEventId(hits);
-        List<EventShortDto> result = ObjectMapper.toEventShortDtoList(events);
+        List<EventShortDto> result = EventMapper.toEventShortDtoList(events);
         for (EventShortDto event : result) {
             event.setViews(views.get(event.getId()));
         }
@@ -190,7 +188,7 @@ public class EventService {
         }
         List<HitOutputDto> hits = unionService.getViews(eventIds);
         Map<Long, Long> views = StatUtil.mapHitsToViewCountByEventId(hits);
-        List<EventFullDto> result = ObjectMapper.toEventFullDtoList(events);
+        List<EventFullDto> result = EventMapper.toEventFullDtoList(events);
         for (EventFullDto event : result) {
             event.setViews(views.getOrDefault(event.getId(), 0L));
         }
@@ -219,7 +217,7 @@ public class EventService {
         Event updateEvent = updateEvent(event, eventDto);
         List<HitOutputDto> hits = unionService.getViews(List.of(eventId));
         Map<Long, Long> views = StatUtil.mapHitsToViewCountByEventId(hits);
-        return ObjectMapper.toEventFullDto(updateEvent, views.getOrDefault(event.getId(), 0L));
+        return EventMapper.toEventFullDto(updateEvent, views.getOrDefault(event.getId(), 0L));
     }
 
     private Event updateEvent(Event event, NewEventDto eventUpdateDto) {
@@ -239,7 +237,7 @@ public class EventService {
             event.setEventDate(eventUpdateDto.getEventDate());
         }
         if (eventUpdateDto.getLocation() != null) {
-            event.setLocation(ObjectMapper.toLocation(eventUpdateDto.getLocation()));
+            event.setLocation(LocationMapper.toLocation(eventUpdateDto.getLocation()));
         }
         if (eventUpdateDto.getPaid() != null) {
             event.setPaid(eventUpdateDto.getPaid());

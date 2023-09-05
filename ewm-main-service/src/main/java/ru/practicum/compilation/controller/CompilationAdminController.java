@@ -11,7 +11,6 @@ import ru.practicum.validation.Create;
 import ru.practicum.validation.Update;
 
 @RestController
-@Validated
 @RequiredArgsConstructor
 @RequestMapping(path = "/admin/compilations")
 public class CompilationAdminController {
@@ -24,7 +23,6 @@ public class CompilationAdminController {
     }
 
     @PatchMapping("/{compId}")
-    @ResponseStatus(value = HttpStatus.OK)
     public CompilationOutputDto updateCompilation(@PathVariable("compId") Long compId,
                                                   @Validated(Update.class) @RequestBody CompilationInputDto compilationDto) {
         return compilationService.updateCompilation(compilationDto, compId);
