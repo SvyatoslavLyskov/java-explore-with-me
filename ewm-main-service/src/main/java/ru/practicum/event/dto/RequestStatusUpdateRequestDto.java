@@ -2,7 +2,6 @@ package ru.practicum.event.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.event.model.Status;
 
 import java.util.List;
 
@@ -14,4 +13,9 @@ import java.util.List;
 public class RequestStatusUpdateRequestDto {
     List<Long> requestIds;
     Status status;
+
+    public enum Status {
+        CONFIRMED,
+        REJECTED
+    }
 }

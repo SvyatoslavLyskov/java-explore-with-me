@@ -133,7 +133,7 @@ public class EventService {
             if (!nextRequest.getStatus().equals(Status.PENDING)) {
                 throw new ConflictException("Запрос должен иметь статус PENDING");
             }
-            if (request.getStatus().equals(CONFIRMED) && vacantPlace > 0) {
+            if (request.getStatus() == (RequestStatusUpdateRequestDto.Status.CONFIRMED) && vacantPlace > 0) {
                 nextRequest.setStatus(CONFIRMED);
                 event.setConfirmedRequests(event.getConfirmedRequests() + 1L);
                 confirmedRequests.add(nextRequest);
