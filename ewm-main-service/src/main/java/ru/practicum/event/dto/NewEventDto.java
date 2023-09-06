@@ -7,10 +7,8 @@ import ru.practicum.event.validation.EventDate;
 import ru.practicum.validation.Create;
 import ru.practicum.validation.Update;
 
-import javax.validation.constraints.Future;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
 import static ru.practicum.utils.DateTimeFormat.DATE_TIME_FORMATTER;
@@ -38,8 +36,11 @@ public class NewEventDto {
     @JsonFormat(pattern = DATE_TIME_FORMATTER)
     LocalDateTime eventDate;
     @NotNull(message = "Локация не указана.", groups = Create.class)
+    @Valid
     LocationDto location;
     Boolean paid;
+    @PositiveOrZero(message = "Количество участников не может быть отрицательным.",
+            groups = {Create.class, Update.class})
     Long participantLimit;
     Boolean requestModeration;
     @NotBlank(message = "Заголовок не может быть пустым и содержать пробелы.", groups = Create.class)

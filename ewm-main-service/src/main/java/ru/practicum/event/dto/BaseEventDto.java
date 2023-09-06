@@ -10,6 +10,7 @@ import ru.practicum.event.validation.EventDate;
 import ru.practicum.validation.Create;
 import ru.practicum.validation.Update;
 
+import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
@@ -37,6 +38,7 @@ public class BaseEventDto {
     @JsonFormat(pattern = DATE_TIME_FORMATTER)
     LocalDateTime eventDate;
     @NotNull(message = "Локация не указана.", groups = Create.class)
+    @Valid
     LocationDto location;
     Boolean paid;
     @PositiveOrZero(message = "Количество участников не может быть отрицательным.",
