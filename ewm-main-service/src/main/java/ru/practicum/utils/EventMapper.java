@@ -2,9 +2,9 @@ package ru.practicum.utils;
 
 import lombok.experimental.UtilityClass;
 import ru.practicum.category.model.Category;
+import ru.practicum.event.dto.BaseEventDto;
 import ru.practicum.event.dto.EventFullDto;
 import ru.practicum.event.dto.EventShortDto;
-import ru.practicum.event.dto.NewEventDto;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.Location;
 import ru.practicum.user.dto.UserShortDto;
@@ -21,7 +21,7 @@ import static ru.practicum.utils.UserMapper.toUserShortDto;
 
 @UtilityClass
 public class EventMapper {
-    public static Event toEvent(NewEventDto dto, Category category, Location location, User user) {
+    public static Event toEvent(BaseEventDto dto, Category category, Location location, User user) {
         return Event.builder()
                 .category(category)
                 .title(dto.getTitle())
