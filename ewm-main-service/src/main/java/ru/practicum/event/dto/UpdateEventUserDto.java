@@ -9,8 +9,6 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateEventUserDto extends UpdateEventDto {
-    StateAction stateAction;
-
     public enum StateAction {
         SEND_TO_REVIEW,
         CANCEL_REVIEW
