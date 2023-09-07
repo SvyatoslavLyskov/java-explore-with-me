@@ -33,6 +33,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ru.practicum.event.dto.UpdateEventAdminDto.StateAction.PUBLISH_EVENT;
+import static ru.practicum.event.dto.UpdateEventAdminDto.StateAction.REJECT_EVENT;
 import static ru.practicum.event.model.State.PUBLISHED;
 import static ru.practicum.event.model.Status.CONFIRMED;
 
@@ -212,15 +214,15 @@ public class EventService {
             UpdateEventAdminDto.StateAction adminEventStateAction;
             switch (updateEventStateAction) {
                 case PUBLISH_EVENT:
-                    adminEventStateAction = UpdateEventAdminDto.StateAction.PUBLISH_EVENT;
+                    adminEventStateAction = PUBLISH_EVENT;
                     break;
                 case REJECT_EVENT:
-                    adminEventStateAction = UpdateEventAdminDto.StateAction.REJECT_EVENT;
+                    adminEventStateAction = REJECT_EVENT;
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid state action: " + updateEventStateAction);
             }
-            if (adminEventStateAction == UpdateEventAdminDto.StateAction.PUBLISH_EVENT) {
+            if (adminEventStateAction == PUBLISH_EVENT) {
                 if (!event.getState().equals(State.PENDING)) {
                     throw new ConflictException(String.format(
                             "Событие - %s, не может быть опубликовано повторно.", event.getTitle()));
