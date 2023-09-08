@@ -46,7 +46,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "AND (COALESCE(:paid, NULL) IS NULL OR e.paid = :paid) " +
             "AND (COALESCE(:rangeStart, NULL) IS NULL OR e.eventDate >= :rangeStart) " +
             "AND (COALESCE(:rangeEnd, NULL) IS NULL OR e.eventDate <= :rangeEnd) " +
-            "AND (e.confirmedRequests < e.participantLimit OR :onlyAvailable = FALSE)" +
+            "AND ((SELECT COUNT(r) FROM e.requests r WHERE r.status = 'CONFIRMED') < e.participantLimit OR :onlyAvailable = FALSE) " +
             "GROUP BY e.id " +
             "ORDER BY LOWER(:sort) ASC")
     List<Event> findEventsByPublic(@Param("text") String text,

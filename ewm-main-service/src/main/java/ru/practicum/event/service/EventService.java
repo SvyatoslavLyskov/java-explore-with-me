@@ -137,7 +137,6 @@ public class EventService {
             }
             if (request.getStatus() == (RequestStatusUpdateRequestDto.Status.CONFIRMED) && vacantPlace > 0) {
                 nextRequest.setStatus(CONFIRMED);
-                event.setConfirmedRequests(event.getConfirmedRequests() + 1L);
                 confirmedRequests.add(nextRequest);
                 vacantPlace--;
             } else {

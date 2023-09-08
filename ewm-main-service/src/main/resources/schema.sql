@@ -33,8 +33,7 @@ CREATE TABLE IF NOT EXISTS events
     created_on          TIMESTAMP NOT NULL,
     initiator_id        BIGINT NOT NULL REFERENCES users (user_id),
     state               VARCHAR(9) NOT NULL,
-    published_on        TIMESTAMP,
-    confirmed_requests  BIGINT
+    published_on        TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS requests

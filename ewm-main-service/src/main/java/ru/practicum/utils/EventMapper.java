@@ -35,7 +35,6 @@ public class EventMapper {
                 .participantLimit(dto.getParticipantLimit())
                 .createdOn(LocalDateTime.now())
                 .requestModeration(dto.getRequestModeration())
-                .confirmedRequests(0L)
                 .build();
     }
 
