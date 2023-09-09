@@ -10,6 +10,7 @@ import ru.practicum.request.dto.RequestDto;
 import ru.practicum.validation.Create;
 import ru.practicum.validation.Update;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
@@ -23,7 +24,8 @@ public class EventPrivateController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EventFullDto createEvent(@PathVariable Long userId, @Validated(Create.class) @RequestBody CreateEventDto dto) {
+    public EventFullDto createEvent(@PathVariable Long userId,
+                                    @Validated(Create.class) @Valid @RequestBody CreateEventDto dto) {
         return eventService.createEvent(userId, dto);
     }
 

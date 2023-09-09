@@ -35,7 +35,7 @@ public class CompilationService {
     public List<CompilationOutputDto> findAllCompilations(Boolean pinned, Integer from, Integer size) {
         PageRequest pageRequest = PageRequest.of(from / size, size);
         List<Compilation> compilations;
-        if (pinned) {
+        if (pinned != null && pinned) {
             compilations = compilationRepository.findByPinned(true, pageRequest);
         } else {
             compilations = compilationRepository.findAll(pageRequest).getContent();

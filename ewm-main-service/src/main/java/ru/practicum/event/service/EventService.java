@@ -31,7 +31,6 @@ import ru.practicum.utils.*;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static ru.practicum.event.dto.UpdateEventAdminDto.StateAction.PUBLISH_EVENT;
 import static ru.practicum.event.dto.UpdateEventAdminDto.StateAction.REJECT_EVENT;
@@ -55,10 +54,11 @@ public class EventService {
 
     @Transactional
     public EventFullDto createEvent(Long userId, CreateEventDto dto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Пользователь", userId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь", userId));
         Long categoryId = dto.getCategory();
-        Category category = categoryRepository.findById(categoryId).orElseThrow(
-                () -> new NotFoundException("Категория", categoryId));
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new NotFoundException("Категория", categoryId));
         Location location = LocationMapper.toLocation(dto.getLocation());
         locationRepository.save(location);
         if (dto.getPaid() == null) {
@@ -83,9 +83,11 @@ public class EventService {
     }
 
     public EventFullDto getInitiatorEventById(Long userId, Long eventId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Событие", eventId));
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Событие", eventId));
         checkInitiator(userId, eventId);
-        List<HitOutputDto> hits = unionService.getViews(List.of(eventId));
+        List<Event> events = Collections.singletonList(event);
+        List<HitOutputDto> hits = unionService.getViews(events);
         Map<Long, Long> views = StatUtil.mapHitsToViewCountByEventId(hits);
         log.info("Найдено событие {} пользователя {}.", eventId, userId);
         return EventMapper.toEventFullDto(event, views.getOrDefault(event.getId(), 0L));
@@ -100,16 +102,17 @@ public class EventService {
 
     @Transactional
     public EventFullDto updateInitiatorEvent(UpdateEventDto eventUpdateDto, Long userId, Long eventId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Событие", eventId));
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Событие", eventId));
         checkInitiator(userId, eventId);
         if (event.getState().equals(PUBLISHED)) {
-            throw new ConflictException(String.format(
-                    "Пользователь %s не может изменить событие %s", userId, eventId));
+            throw new ConflictException(String.format("Пользователь %s не может изменить событие %s", userId, eventId));
         }
         Event updatedEvent = updateEvent(event, eventUpdateDto);
-        List<HitOutputDto> hits = unionService.getViews(List.of(eventId));
+        List<Event> events = Collections.singletonList(updatedEvent);
+        List<HitOutputDto> hits = unionService.getViews(events);
         Map<Long, Long> views = StatUtil.mapHitsToViewCountByEventId(hits);
-        return EventMapper.toEventFullDto(updatedEvent, views.getOrDefault(event.getId(), 0L));
+        return EventMapper.toEventFullDto(updatedEvent, views.getOrDefault(eventId, 0L));
     }
 
     @Transactional
@@ -157,7 +160,8 @@ public class EventService {
         String uri = request.getRequestURI();
         String ip = request.getRemoteAddr();
         sendStats(uri, ip);
-        List<HitOutputDto> hits = unionService.getViews(List.of(id));
+        List<Event> events = Collections.singletonList(event);
+        List<HitOutputDto> hits = unionService.getViews(events);
         Map<Long, Long> views = StatUtil.mapHitsToViewCountByEventId(hits);
         return EventMapper.toEventFullDto(event, views.getOrDefault(event.getId(), 0L));
     }
@@ -174,9 +178,8 @@ public class EventService {
         PageRequest pageRequest = PageRequest.of(from / size, size);
         List<Event> events = eventRepository.findEventsByPublic(
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, pageRequest);
-        List<Long> eventIds = events.stream().map(Event::getId).collect(Collectors.toList());
         sendStats(uri, ip);
-        List<HitOutputDto> hits = unionService.getViews(eventIds);
+        List<HitOutputDto> hits = unionService.getViews(events);
         Map<Long, Long> views = StatUtil.mapHitsToViewCountByEventId(hits);
         List<EventShortDto> result = EventMapper.toEventShortDtoList(events);
         for (EventShortDto event : result) {
@@ -191,11 +194,7 @@ public class EventService {
         PageRequest pageRequest = PageRequest.of(from / size, size);
         List<Event> events = eventRepository.findAllEventsByAdmin(
                 users, states, categories, rangeStart, rangeEnd, pageRequest);
-        List<Long> eventIds = new ArrayList<>();
-        for (Event event : events) {
-            eventIds.add(event.getId());
-        }
-        List<HitOutputDto> hits = unionService.getViews(eventIds);
+        List<HitOutputDto> hits = unionService.getViews(events);
         Map<Long, Long> views = StatUtil.mapHitsToViewCountByEventId(hits);
         List<EventFullDto> result = EventMapper.toEventFullDtoList(events);
         for (EventFullDto event : result) {
@@ -223,23 +222,22 @@ public class EventService {
             }
             if (adminEventStateAction == PUBLISH_EVENT) {
                 if (!event.getState().equals(State.PENDING)) {
-                    throw new ConflictException(String.format(
-                            "Событие - %s, не может быть опубликовано повторно.", event.getTitle()));
+                    throw new ConflictException(String.format("Событие - %s, не может быть опубликовано повторно.", event.getTitle()));
                 }
                 event.setPublishedOn(LocalDateTime.now());
                 event.setState(State.PUBLISHED);
             } else {
                 if (!event.getState().equals(State.PENDING)) {
-                    throw new ConflictException(String.format(
-                            "Событие - %s, не может быть отменено без статуса \"PENDING\"", event.getTitle()));
+                    throw new ConflictException(String.format("Событие - %s, не может быть отменено без статуса \"PENDING\"", event.getTitle()));
                 }
                 event.setState(State.CANCELED);
             }
         }
         Event updatedEvent = updateEvent(event, eventDto);
-        List<HitOutputDto> hits = unionService.getViews(List.of(eventId));
+        List<Event> events = Collections.singletonList(updatedEvent);
+        List<HitOutputDto> hits = unionService.getViews(events);
         Map<Long, Long> views = StatUtil.mapHitsToViewCountByEventId(hits);
-        return EventMapper.toEventFullDto(updatedEvent, views.getOrDefault(event.getId(), 0L));
+        return EventMapper.toEventFullDto(updatedEvent, views.getOrDefault(eventId, 0L));
     }
 
     private Event updateEvent(Event event, UpdateEventDto eventUpdateDto) {

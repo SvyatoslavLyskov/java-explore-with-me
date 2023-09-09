@@ -15,13 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static ru.practicum.event.model.State.PENDING;
-import static ru.practicum.utils.CategoryMapper.toCategoryDto;
-import static ru.practicum.utils.LocationMapper.toLocationDto;
-import static ru.practicum.utils.UserMapper.toUserShortDto;
 
 @UtilityClass
 public class EventMapper {
-    public static Event toEvent(BaseEventDto dto, Category category, Location location, User user) {
+    public Event toEvent(BaseEventDto dto, Category category, Location location, User user) {
         return Event.builder()
                 .category(category)
                 .title(dto.getTitle())
@@ -38,17 +35,17 @@ public class EventMapper {
                 .build();
     }
 
-    public static EventFullDto toEventFullDto(Event event, Long views) {
+    public EventFullDto toEventFullDto(Event event, Long views) {
         return new EventFullDto(
                 event.getAnnotation(),
-                toCategoryDto(event.getCategory()),
+                CategoryMapper.toCategoryDto(event.getCategory()),
                 event.getConfirmedRequests(),
                 event.getCreatedOn(),
                 event.getDescription(),
                 event.getEventDate(),
                 event.getId(),
-                toUserShortDto(event.getInitiator()),
-                toLocationDto(event.getLocation()),
+                UserMapper.toUserShortDto(event.getInitiator()),
+                LocationMapper.toLocationDto(event.getLocation()),
                 event.getPaid(),
                 event.getParticipantLimit(),
                 event.getPublishedOn(),
@@ -59,11 +56,11 @@ public class EventMapper {
         );
     }
 
-    public static EventShortDto toEventShortDto(Event event, Long views) {
+    public EventShortDto toEventShortDto(Event event, Long views) {
         User user = event.getInitiator();
         return new EventShortDto(
                 event.getAnnotation(),
-                toCategoryDto(event.getCategory()),
+                CategoryMapper.toCategoryDto(event.getCategory()),
                 event.getConfirmedRequests(),
                 event.getEventDate(),
                 event.getId(),
@@ -74,7 +71,7 @@ public class EventMapper {
         );
     }
 
-    public static List<EventShortDto> toEventShortDtoList(Iterable<Event> events) {
+    public List<EventShortDto> toEventShortDtoList(Iterable<Event> events) {
         List<EventShortDto> result = new ArrayList<>();
         for (Event event : events) {
             result.add(toEventShortDto(event, 0L));
@@ -82,7 +79,7 @@ public class EventMapper {
         return result;
     }
 
-    public static List<EventFullDto> toEventFullDtoList(Iterable<Event> events) {
+    public List<EventFullDto> toEventFullDtoList(Iterable<Event> events) {
         List<EventFullDto> result = new ArrayList<>();
         for (Event event : events) {
             result.add(toEventFullDto(event, 0L));

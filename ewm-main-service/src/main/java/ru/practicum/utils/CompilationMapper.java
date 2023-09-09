@@ -9,8 +9,6 @@ import ru.practicum.event.dto.EventShortDto;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ru.practicum.utils.EventMapper.toEventShortDtoList;
-
 @UtilityClass
 public class CompilationMapper {
     public Compilation toCompilation(CompilationInputDto dto) {
@@ -23,7 +21,7 @@ public class CompilationMapper {
     public CompilationOutputDto toCompilationOutputDto(Compilation compilation) {
         List<EventShortDto> events = new ArrayList<>();
         if (compilation.getEvents() != null) {
-            events = toEventShortDtoList(compilation.getEvents());
+            events = EventMapper.toEventShortDtoList(compilation.getEvents());
         }
         return new CompilationOutputDto(
                 compilation.getId(),

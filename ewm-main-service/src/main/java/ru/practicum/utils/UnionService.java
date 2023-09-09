@@ -7,11 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.HitClient;
 import ru.practicum.HitOutputDto;
 import ru.practicum.event.model.Event;
-import ru.practicum.event.repository.EventRepository;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -19,13 +19,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UnionService {
     private final HitClient hitClient;
-    private final EventRepository eventRepository;
 
-    public List<HitOutputDto> getViews(List<Long> eventIds) {
+    public List<HitOutputDto> getViews(List<Event> events) {
+        List<Long> eventIds = events.stream()
+                .map(Event::getId)
+                .collect(Collectors.toList());
         if (eventIds.isEmpty()) {
             return Collections.emptyList();
         }
-        LocalDateTime startDate = getEarliestPublicationDate(eventIds);
+        LocalDateTime startDate = getEarliestPublicationDate(events);
         if (startDate == null) {
             return Collections.emptyList();
         }
@@ -35,23 +37,14 @@ public class UnionService {
         return response;
     }
 
-    private LocalDateTime getEarliestPublicationDate(List<Long> eventIds) {
+    private LocalDateTime getEarliestPublicationDate(List<Event> events) {
         LocalDateTime earliestDate = null;
-        for (Long eventId : eventIds) {
-            LocalDateTime publicationDate = getPublicationDate(eventId);
+        for (Event event : events) {
+            LocalDateTime publicationDate = event.getPublishedOn();
             if (publicationDate != null && (earliestDate == null || publicationDate.isBefore(earliestDate))) {
                 earliestDate = publicationDate;
-
             }
         }
         return earliestDate;
-    }
-
-    private LocalDateTime getPublicationDate(Long eventId) {
-        Event event = eventRepository.findById(eventId).orElse(null);
-        if (event != null) {
-            return event.getPublishedOn();
-        }
-        return null;
     }
 }

@@ -1,5 +1,6 @@
 package ru.practicum.utils;
 
+import lombok.experimental.UtilityClass;
 import ru.practicum.HitOutputDto;
 
 import java.util.ArrayList;
@@ -7,9 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@UtilityClass
 public class StatUtil {
 
-    public static List<String> makeUrisWithEventIds(List<Long> eventIds) {
+    public List<String> makeUrisWithEventIds(List<Long> eventIds) {
         List<String> uris = new ArrayList<>();
         for (Long eventId : eventIds) {
             String uri = "/events/" + eventId;
@@ -18,7 +20,7 @@ public class StatUtil {
         return uris;
     }
 
-    public static Map<Long, Long> mapHitsToViewCountByEventId(List<HitOutputDto> hits) {
+    public Map<Long, Long> mapHitsToViewCountByEventId(List<HitOutputDto> hits) {
         Map<Long, Long> views = new HashMap<>();
         for (HitOutputDto hit : hits) {
             String[] split = hit.getUri().split("/");
