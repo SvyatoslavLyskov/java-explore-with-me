@@ -57,7 +57,7 @@ public class Event {
     @Enumerated(EnumType.STRING)
     @Column(name = "state", length = 9)
     State state;
-    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "event", fetch = FetchType.EAGER)
     @JsonManagedReference
     @ToString.Exclude
     private Collection<Request> requests;
