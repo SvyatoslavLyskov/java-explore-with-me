@@ -4,11 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.mapper.HitMapper;
 import ru.practicum.HitInputDto;
 import ru.practicum.HitOutputDto;
-import ru.practicum.repository.HitRepository;
+import ru.practicum.exception.ValidationException;
+import ru.practicum.mapper.HitMapper;
 import ru.practicum.model.Hit;
+import ru.practicum.repository.HitRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +30,9 @@ public class HitService {
 
     public List<HitOutputDto> getHitStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
         List<HitOutputDto> hitStats;
+        if (start.isAfter(end)) {
+            throw new ValidationException("Дата начала раньше даты окончания.");
+        }
         if (uris != null) {
             if (unique) {
                 hitStats = hitRepository.findAllByTimestampAndUrisAndUniqueIp(start, end, uris);
