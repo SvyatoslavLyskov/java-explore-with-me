@@ -26,7 +26,11 @@ import ru.practicum.request.model.Request;
 import ru.practicum.request.repository.RequestRepository;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserRepository;
-import ru.practicum.utils.*;
+import ru.practicum.utils.StatUtil;
+import ru.practicum.utils.UnionService;
+import ru.practicum.utils.EventMapper;
+import ru.practicum.utils.LocationMapper;
+import ru.practicum.utils.RequestMapper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;

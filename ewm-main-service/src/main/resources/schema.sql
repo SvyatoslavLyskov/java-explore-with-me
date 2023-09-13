@@ -3,13 +3,13 @@ CREATE TABLE IF NOT EXISTS users
     user_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY UNIQUE,
     user_email  VARCHAR(254) NOT NULL UNIQUE,
     user_name   VARCHAR(250) NOT NULL UNIQUE
-);
+    );
 
 CREATE TABLE IF NOT EXISTS categories
 (
     category_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY UNIQUE,
     category_name   VARCHAR(50) NOT NULL UNIQUE
-);
+    );
 
 CREATE TABLE IF NOT EXISTS locations
 (
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS events
     initiator_id        BIGINT NOT NULL REFERENCES users (user_id),
     state               VARCHAR(9) NOT NULL,
     published_on        TIMESTAMP
-);
+    );
 
 CREATE TABLE IF NOT EXISTS requests
 (
@@ -43,21 +43,29 @@ CREATE TABLE IF NOT EXISTS requests
     event_id        BIGINT NOT NULL REFERENCES events (event_id),
     requester_id    BIGINT NOT NULL REFERENCES users (user_id),
     status          VARCHAR(9) NOT NULL,
-
     CONSTRAINT uq_request UNIQUE(event_id, requester_id)
-);
+    );
 
 CREATE TABLE IF NOT EXISTS compilations
 (
     compilation_id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY UNIQUE,
     pinned              BOOLEAN NOT NULL,
     compilation_title   VARCHAR(50) NOT NULL UNIQUE
-);
+    );
 
 CREATE TABLE IF NOT EXISTS compilations_events
 (
     compilation_id  BIGINT REFERENCES compilations (compilation_id),
     event_id        BIGINT REFERENCES events (event_id),
-
     PRIMARY KEY (compilation_id, event_id)
-);
+    );
+
+CREATE TABLE IF NOT EXISTS comments
+(
+    comment_id  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY UNIQUE,
+    text        VARCHAR(1000) NOT NULL,
+    author_id   BIGINT REFERENCES users (user_id),
+    event_id    BIGINT REFERENCES events(event_id),
+    created     TIMESTAMP NOT NULL,
+    edited      BOOLEAN NOT NULL
+    );
