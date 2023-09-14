@@ -11,8 +11,8 @@ import ru.practicum.compilation.model.Compilation;
 import ru.practicum.compilation.repository.CompilationRepository;
 import ru.practicum.event.repository.EventRepository;
 import ru.practicum.exception.NotFoundException;
-import ru.practicum.utils.CompilationMapper;
 import ru.practicum.utils.UnionService;
+import ru.practicum.utils.CompilationMapper;
 
 import java.util.ArrayList;
 import java.util.List;
